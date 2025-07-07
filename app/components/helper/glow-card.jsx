@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-const GlowCard = ({ children , identifier}) => {
+const GlowCard = ({ children, identifier }) => {
   useEffect(() => {
     const CONTAINER = document.querySelector(`.glow-container-${identifier}`);
     const CARDS = document.querySelectorAll(`.glow-card-${identifier}`);
@@ -47,9 +47,8 @@ const GlowCard = ({ children , identifier}) => {
       }
     };
 
-    document.body.addEventListener('pointermove', UPDATE);
-
     const RESTYLE = () => {
+      if (!CONTAINER) return; // ✅ Check before applying styles
       CONTAINER.style.setProperty('--gap', CONFIG.gap);
       CONTAINER.style.setProperty('--blur', CONFIG.blur);
       CONTAINER.style.setProperty('--spread', CONFIG.spread);
@@ -60,9 +59,9 @@ const GlowCard = ({ children , identifier}) => {
     };
 
     RESTYLE();
+    document.body.addEventListener('pointermove', UPDATE);
     UPDATE();
 
-    // Cleanup event listener
     return () => {
       document.body.removeEventListener('pointermove', UPDATE);
     };
