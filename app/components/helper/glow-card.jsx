@@ -7,7 +7,10 @@ const GlowCard = ({ children, identifier }) => {
   const cardRef = useRef(null);
 
   useEffect(() => {
-    if (!containerRef.current || !cardRef.current) return;
+    const container = containerRef.current;
+    const card = cardRef.current;
+
+    if (!container || !card) return;
 
     const CONFIG = {
       proximity: 40,
@@ -18,49 +21,37 @@ const GlowCard = ({ children, identifier }) => {
       opacity: 0,
     };
 
-    const CARD = cardRef.current;
-    const CONTAINER = containerRef.current;
-
-    const UPDATE = (event) => {
-      const CARD_BOUNDS = CARD.getBoundingClientRect();
+    const handlePointerMove = (event) => {
+      const bounds = card.getBoundingClientRect();
 
       const isNear =
-        event?.x > CARD_BOUNDS.left - CONFIG.proximity &&
-        event?.x < CARD_BOUNDS.left + CARD_BOUNDS.width + CONFIG.proximity &&
-        event?.y > CARD_BOUNDS.top - CONFIG.proximity &&
-        event?.y < CARD_BOUNDS.top + CARD_BOUNDS.height + CONFIG.proximity;
+        event.clientX > bounds.left - CONFIG.proximity &&
+        event.clientX < bounds.left + bounds.width + CONFIG.proximity &&
+        event.clientY > bounds.top - CONFIG.proximity &&
+        event.clientY < bounds.top + bounds.height + CONFIG.proximity;
 
-      CARD.style.setProperty('--active', isNear ? 1 : CONFIG.opacity.toString());
+      card.style.setProperty('--active', isNear ? '1' : CONFIG.opacity.toString());
 
-      const CARD_CENTER = [
-        CARD_BOUNDS.left + CARD_BOUNDS.width * 0.5,
-        CARD_BOUNDS.top + CARD_BOUNDS.height * 0.5,
-      ];
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
 
-      let ANGLE =
-        (Math.atan2(event?.y - CARD_CENTER[1], event?.x - CARD_CENTER[0]) * 180) /
-        Math.PI;
+      let angle = (Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180) / Math.PI;
+      angle = angle < 0 ? angle + 360 : angle;
 
-      ANGLE = ANGLE < 0 ? ANGLE + 360 : ANGLE;
-
-      CARD.style.setProperty('--start', (ANGLE + 90).toString());
+      card.style.setProperty('--start', `${angle + 90}`);
     };
 
-    const RESTYLE = () => {
-      CONTAINER.style.setProperty('--gap', CONFIG.gap.toString());
-      CONTAINER.style.setProperty('--blur', CONFIG.blur.toString());
-      CONTAINER.style.setProperty('--spread', CONFIG.spread.toString());
-      CONTAINER.style.setProperty(
-        '--direction',
-        CONFIG.vertical ? 'column' : 'row'
-      );
-    };
+    // Apply static styles
+    container.style.setProperty('--gap', CONFIG.gap.toString());
+    container.style.setProperty('--blur', CONFIG.blur.toString());
+    container.style.setProperty('--spread', CONFIG.spread.toString());
+    container.style.setProperty('--direction', CONFIG.vertical ? 'column' : 'row');
 
-    RESTYLE();
-    window.addEventListener('pointermove', UPDATE);
+    // Attach pointermove listener only to the container
+    container.addEventListener('pointermove', handlePointerMove);
 
     return () => {
-      window.removeEventListener('pointermove', UPDATE);
+      container.removeEventListener('pointermove', handlePointerMove);
     };
   }, []);
 
