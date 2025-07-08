@@ -1,11 +1,15 @@
-"use client"
+'use client';
 
 import { useEffect } from 'react';
 
 const GlowCard = ({ children, identifier }) => {
   useEffect(() => {
+    if (!identifier || typeof window === 'undefined') return;
+
     const CONTAINER = document.querySelector(`.glow-container-${identifier}`);
     const CARDS = document.querySelectorAll(`.glow-card-${identifier}`);
+
+    if (!CONTAINER || !CARDS.length) return;
 
     const CONFIG = {
       proximity: 40,
@@ -20,16 +24,13 @@ const GlowCard = ({ children, identifier }) => {
       for (const CARD of CARDS) {
         const CARD_BOUNDS = CARD.getBoundingClientRect();
 
-        if (
+        const isNear =
           event?.x > CARD_BOUNDS.left - CONFIG.proximity &&
           event?.x < CARD_BOUNDS.left + CARD_BOUNDS.width + CONFIG.proximity &&
           event?.y > CARD_BOUNDS.top - CONFIG.proximity &&
-          event?.y < CARD_BOUNDS.top + CARD_BOUNDS.height + CONFIG.proximity
-        ) {
-          CARD.style.setProperty('--active', 1);
-        } else {
-          CARD.style.setProperty('--active', CONFIG.opacity);
-        }
+          event?.y < CARD_BOUNDS.top + CARD_BOUNDS.height + CONFIG.proximity;
+
+        CARD.style.setProperty('--active', isNear ? 1 : CONFIG.opacity);
 
         const CARD_CENTER = [
           CARD_BOUNDS.left + CARD_BOUNDS.width * 0.5,
@@ -48,7 +49,6 @@ const GlowCard = ({ children, identifier }) => {
     };
 
     const RESTYLE = () => {
-      if (!CONTAINER) return; // ✅ Check before applying styles
       CONTAINER.style.setProperty('--gap', CONFIG.gap);
       CONTAINER.style.setProperty('--blur', CONFIG.blur);
       CONTAINER.style.setProperty('--spread', CONFIG.spread);
@@ -68,8 +68,10 @@ const GlowCard = ({ children, identifier }) => {
   }, [identifier]);
 
   return (
-    <div className={`glow-container-${identifier} glow-container`}>
-      <article className={`glow-card glow-card-${identifier} h-fit cursor-pointer border border-[#2a2e5a] transition-all duration-300 relative bg-[#101123] text-gray-200 rounded-xl hover:border-transparent w-full`}>
+    <div className={`glow-container glow-container-${identifier}`}>
+      <article
+        className={`glow-card glow-card-${identifier} h-fit cursor-pointer border border-[#2a2e5a] transition-all duration-300 relative bg-[#101123] text-gray-200 rounded-xl hover:border-transparent w-full`}
+      >
         <div className="glows"></div>
         {children}
       </article>

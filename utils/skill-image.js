@@ -83,6 +83,9 @@ import linux from '../app/assets/svg/skills/linux.svg'
 import sqlalchemy from '../app/assets/svg/skills/sqlalchemy.svg'
 import fastapi from '../app/assets/svg/skills/fastapi.svg'
 
+import gitHub from "../app/assets/svg/skills/github.svg";
+import api from "../app/assets/svg/skills/api.svg";
+import responsive from "../app/assets/svg/skills/responsive.svg";
 
 
 export const skillsImage = (skill) => {
@@ -92,6 +95,12 @@ export const skillsImage = (skill) => {
       return gcp;
     case 'html':
       return html;
+    case 'restful apis':
+      return api;
+    case 'github':
+      return gitHub;
+    case 'responsive ui design':
+      return responsive;
     case 'photoshop':
       return photoshop;
     case 'docker':
